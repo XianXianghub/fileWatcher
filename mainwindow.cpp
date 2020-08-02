@@ -19,11 +19,14 @@ MainWindow::MainWindow(QWidget *parent) :
     BrowerRect=ui->brower_status->geometry();
     ui->brower_status->setStyleSheet("font-size : 16px");
     m_pSystemWatcher = new QFileSystemWatcher();
+    timer = new QTimer( this );
+    timer->setSingleShot(true);
     this->setWindowTitle("fileWatcher");
     DirDefault();
+    connect(timer, SIGNAL(timeout()), this, SLOT(Timeout()) );
     connect(m_pSystemWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(directoryUpdated(QString)));
     connect(m_pSystemWatcher, SIGNAL(fileChanged(QString)), this, SLOT(fileUpdated(QString)));
-    connect(ui->brower_status, SIGNAL(cursorPositionChanged()), this, SLOT(autoScroll()));
+    connect(ui->brower_status, SIGNAL(textChanged()), this, SLOT(autoScroll()));
     QxtGlobalShortcut *shortcut = new QxtGlobalShortcut(this);
 
     if(shortcut->setShortcut(QKeySequence("Ctrl+d")))
@@ -62,10 +65,15 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::autoScroll()
 {
     QTextCursor cursor =  ui->brower_status->textCursor();
-       cursor.movePosition(QTextCursor::End);
-       ui->brower_status->setTextCursor(cursor);
+    cursor.movePosition(QTextCursor::End);
+    ui->brower_status->setTextCursor(cursor);
+}
 
-
+void MainWindow::Timeout()
+{
+      qDebug()<<"timeout once";
+      setWindowState(Qt::WindowNoState);
+      hide();
 
 }
 
@@ -145,6 +153,15 @@ void MainWindow::directoryUpdated(const QString &path)
                     if(ret.compare("1")==0){
                          qDebug() << "complie sucess "  ;
                          printLog("编译成功");
+                         setWindowState(Qt::WindowActive);
+                         setGeometry(curGemRect);
+                         activateWindow();
+                         show();
+
+                         if(timer->isActive())
+                             timer->stop();   //停止定时器
+                         timer->start(SHOWTIME);
+
                          QString cmd = "adb push " +ui->listen_path->text()+"\\"+mifile+ " system/app";
                          mfind.SendCmd(cmd,1);
                          //mfind.SendCmd("adb shell monkey -p com.unionman.settings 1",1);
@@ -156,6 +173,10 @@ void MainWindow::directoryUpdated(const QString &path)
                          ui->brower_status->setFixedSize(600, 500);
                          this->setFixedSize(700,600);
                          printLog("编译失败");
+                         setWindowState(Qt::WindowActive);
+                         setGeometry(curGemRect);
+                         activateWindow();
+                         show();
                          ReadLogShow();
                     }
                 }
@@ -259,9 +280,6 @@ void MainWindow::on_listen_clicked()
   //      QString writestring = errorValue[0].append("&&").append(ui->cmd_input->text().trimmed());
     qDebug()<<writestring;
      out<<writestring;
-//    txtOutput<<ui->listen_path->text().trimmed()+"&&"<<ui->cmd_input->text().trimmed()<<endl;
-//    qDebug()<<ui->listen_path->text().trimmed()+"&&"<<ui->cmd_input->text().trimmed()<<endl;
-
     addWatchPath(listenPath);
     printLog("监听中...");
     ui->listen->setEnabled(false);
@@ -279,16 +297,6 @@ void MainWindow::on_startmm_clicked()
 
     if(file.exists()==false){
           qDebug()<<"文件不存在";
-          if(isActiveWindow()){
-              setWindowState(Qt::WindowNoState);
-              hide();
-          }else{
-              setWindowState(Qt::WindowActive);
-              setGeometry(curGemRect);
-              activateWindow();
-              show();
-          }
-
     }else{
         QFile fileTemp(delfile);
         fileTemp.remove();
@@ -299,6 +307,10 @@ void MainWindow::on_startmm_clicked()
        activateWindow();
        show();
        printLog("编译中...");
+       //判断定时器是否运行
+       if(timer->isActive())
+           timer->stop();   //停止定时器
+       timer->start(SHOWTIME);
     }
     ui->brower_status->setFixedSize(BrowerRect.width(),BrowerRect.height());
     this->setFixedSize(WindowRect.width(),WindowRect.height());

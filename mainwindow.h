@@ -35,7 +35,7 @@ public slots:
     void fileUpdated(const QString &path); // 文件被修改时调用，
     void on_pushButton_clicked();
     void autoScroll();
-
+    void Timeout();
 
 private slots:
     void on_chosedir_clicked();
@@ -59,6 +59,8 @@ private:
      adb_find mfind;
      QRect WindowRect;
      QRect BrowerRect;
+     QTimer *timer;
+     int SHOWTIME = 500;
 };
 
 
