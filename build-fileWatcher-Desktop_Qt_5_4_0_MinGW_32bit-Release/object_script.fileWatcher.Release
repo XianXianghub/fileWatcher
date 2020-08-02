@@ -1,0 +1,14 @@
+INPUT(
+./release\qxtglobal.o
+./release\qxtwindowsystem.o
+./release\qxtglobalshortcut.o
+./release\qxtwindowsystem_win.o
+./release\qxtglobalshortcut_win.o
+./release\main.o
+./release\mainwindow.o
+./release\smtp.o
+./release\adb_find.o
+./release\moc_qxtglobalshortcut.o
+./release\moc_mainwindow.o
+./release\moc_smtp.o
+);
