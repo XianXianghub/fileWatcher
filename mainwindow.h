@@ -28,11 +28,14 @@ public:
     void moveEvent(QMoveEvent *event);
     void setForceinit();
     void printLog(QString str);
+    void ReadLogShow();
     QRect curGemRect;
 public slots:
     void directoryUpdated(const QString &path); // 目录更新时调用，
     void fileUpdated(const QString &path); // 文件被修改时调用，
     void on_pushButton_clicked();
+    void autoScroll();
+
 
 private slots:
     void on_chosedir_clicked();

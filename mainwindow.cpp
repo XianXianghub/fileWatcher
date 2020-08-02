@@ -17,12 +17,13 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setFixedSize(400,240); //设置窗体固定大小
     WindowRect = this->geometry();
     BrowerRect=ui->brower_status->geometry();
+    ui->brower_status->setStyleSheet("font-size : 16px");
     m_pSystemWatcher = new QFileSystemWatcher();
     this->setWindowTitle("fileWatcher");
     DirDefault();
     connect(m_pSystemWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(directoryUpdated(QString)));
     connect(m_pSystemWatcher, SIGNAL(fileChanged(QString)), this, SLOT(fileUpdated(QString)));
-
+    connect(ui->brower_status, SIGNAL(cursorPositionChanged()), this, SLOT(autoScroll()));
     QxtGlobalShortcut *shortcut = new QxtGlobalShortcut(this);
 
     if(shortcut->setShortcut(QKeySequence("Ctrl+d")))
@@ -56,6 +57,16 @@ void MainWindow::on_pushButton_clicked()
 {
   qDebug()<<"yyy";
   on_startmm_clicked();
+}
+
+void MainWindow::autoScroll()
+{
+    QTextCursor cursor =  ui->brower_status->textCursor();
+       cursor.movePosition(QTextCursor::End);
+       ui->brower_status->setTextCursor(cursor);
+
+
+
 }
 
 MainWindow::~MainWindow()
@@ -141,10 +152,11 @@ void MainWindow::directoryUpdated(const QString &path)
                          QString startapp = ui->cmd_input->text().trimmed();
                          mfind.SendCmd(startapp,1);
                     }else{
-                         printLog("编译失败");
+                         qDebug() << "complie failed "  ;
                          ui->brower_status->setFixedSize(600, 500);
                          this->setFixedSize(700,600);
-                         qDebug() << "complie failed "  ;
+                         printLog("编译失败");
+                         ReadLogShow();
                     }
                 }
             }
@@ -325,6 +337,31 @@ void MainWindow::printLog(QString str)
     QDateTime current_date_time = QDateTime::currentDateTime();
     QString current_date = current_date_time.toString("hh:mm:ss");
     ui->brower_status->append(current_date+": "+str);
+}
+
+void MainWindow::ReadLogShow()
+{
+    QString outpath = listenPath.trimmed()+"/out.log";
+    QFile file(outpath);
+    QFileInfo finfo(outpath);
+    qDebug()<<"forcefile=="+outpath;
+    if(finfo.exists()==false){
+          qDebug()<<"out.log 文件不存在";
+    }else{
+        if (!file.open(QIODevice::ReadOnly|QIODevice::Text))//打开指定文件
+        {
+            QMessageBox::about(NULL, "文件", "文件打开失败");
+        }
+        QTextStream txtInput(&file);
+        QString lineStr;
+        while (!txtInput.atEnd())
+        {
+            lineStr = txtInput.readLine();  //读取数据
+            ui->brower_status->append(lineStr);
+        }
+
+        file.close();
+    }
 }
 
 void MainWindow::on_checkBox_clicked()
