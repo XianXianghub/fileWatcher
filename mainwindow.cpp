@@ -20,6 +20,12 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->brower_status->setStyleSheet("font-size : 16px");
     m_pSystemWatcher = new QFileSystemWatcher();
     timer = new QTimer( this );
+
+    thread2 = new QThread();
+
+    mSendTread = new sendthread();       //发送命令线程，用于延时较大的命令
+    mSendTread->moveToThread(thread2);
+    thread2->start();
     timer->setSingleShot(true);
     this->setWindowTitle("fileWatcher");
     DirDefault();
@@ -27,6 +33,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_pSystemWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(directoryUpdated(QString)));
     connect(m_pSystemWatcher, SIGNAL(fileChanged(QString)), this, SLOT(fileUpdated(QString)));
     connect(ui->brower_status, SIGNAL(textChanged()), this, SLOT(autoScroll()));
+    connect(this,SIGNAL(StartSendCMD(QString , int)),mSendTread,SLOT(SendCmd(QString,int)));  //发送耗时命令到线程执行
+
     QxtGlobalShortcut *shortcut = new QxtGlobalShortcut(this);
 
     if(shortcut->setShortcut(QKeySequence("Ctrl+d")))
@@ -163,11 +171,13 @@ void MainWindow::directoryUpdated(const QString &path)
                          timer->start(SHOWTIME);
 
                          QString cmd = "adb push " +ui->listen_path->text()+"\\"+mifile+ " system/app";
-                         mfind.SendCmd(cmd,1);
+                       //  mfind.SendCmd(cmd,1);
+                         emit StartSendCMD(cmd , 0);
                          //mfind.SendCmd("adb shell monkey -p com.unionman.settings 1",1);
 
                          QString startapp = ui->cmd_input->text().trimmed();
-                         mfind.SendCmd(startapp,1);
+                         //mfind.SendCmd(startapp,1);
+                         emit StartSendCMD(startapp , 0);
                     }else{
                          qDebug() << "complie failed "  ;
                          ui->brower_status->setFixedSize(600, 500);

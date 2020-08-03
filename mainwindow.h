@@ -11,6 +11,9 @@
 #include <QFile>
 #include "qxtglobalshortcut.h"
 #include "tipsdlg.h"
+#include "sendthread.h"
+
+
 
 namespace Ui {
 class MainWindow;
@@ -46,6 +49,9 @@ private slots:
 
     void on_checkBox_clicked();
 
+signals:
+    void StartSendCMD(QString , int);
+
 private:
 
   QFile *defautarg;
@@ -61,6 +67,8 @@ private:
      QRect BrowerRect;
      QTimer *timer;
      int SHOWTIME = 500;
+     sendthread *mSendTread;
+      QThread *thread2;
 };
 
 
