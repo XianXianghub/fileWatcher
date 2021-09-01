@@ -191,7 +191,7 @@ void MainWindow::directoryUpdated(const QString &path)
                          timer->start(SHOWTIME);
 
                          QStringList cmds;
-                         QString cmd = "adb push " +ui->listen_path->text()+"\/"+mifile+ " system/app/ScannerService";
+                         QString cmd = "adb push " +ui->listen_path->text()+"\/"+mifile+ " system/app/ScannerService/";
                          cmds.append(cmd);
                          QString startapp = ui->cmd_input->text().trimmed();
                           cmds.append(startapp);

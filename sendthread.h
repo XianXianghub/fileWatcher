@@ -29,7 +29,7 @@ public:
 signals:
 
 public slots:
-    void SendCmd(QString,int);
+    void SendCmd(QStringList,int);
 
 
 };

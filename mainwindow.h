@@ -37,6 +37,7 @@ public slots:
     void directoryUpdated(const QString &path); // 目录更新时调用，
     void fileUpdated(const QString &path); // 文件被修改时调用，
     void on_pushButton_clicked();
+    void on_close_slot();
     void autoScroll();
     void Timeout();
 
@@ -50,7 +51,7 @@ private slots:
     void on_checkBox_clicked();
 
 signals:
-    void StartSendCMD(QString , int);
+    void StartSendCMD(QStringList , int);
 
 private:
 
