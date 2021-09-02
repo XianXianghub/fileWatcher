@@ -29,6 +29,7 @@ MainWindow::MainWindow(QWidget *parent) :
     timer->setSingleShot(true);
     this->setWindowTitle("fileWatcher");
     DirDefault();
+    getCmdlist();
     connect(timer, SIGNAL(timeout()), this, SLOT(Timeout()) );
     connect(m_pSystemWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(directoryUpdated(QString)));
     connect(m_pSystemWatcher, SIGNAL(fileChanged(QString)), this, SLOT(fileUpdated(QString)));
@@ -37,7 +38,6 @@ MainWindow::MainWindow(QWidget *parent) :
 
     QxtGlobalShortcut *shortcut = new QxtGlobalShortcut(this);
     QxtGlobalShortcut *shortcutClose = new QxtGlobalShortcut(this);
-
     if(shortcut->setShortcut(QKeySequence("Ctrl+d")))
     {  
         connect(shortcut, SIGNAL(activated()), this, SLOT(on_pushButton_clicked()));
@@ -189,14 +189,7 @@ void MainWindow::directoryUpdated(const QString &path)
                          if(timer->isActive())
                              timer->stop();   //停止定时器
                          timer->start(SHOWTIME);
-
-                         QStringList cmds;
-                         QString cmd = "adb push " +ui->listen_path->text()+"\/"+mifile+ " system/app/ScannerService";
-                         cmds.append(cmd);
-                         QString startapp = ui->cmd_input->text().trimmed();
-                          cmds.append(startapp);
-                         //mfind.SendCmd(startapp,1);
-                         emit StartSendCMD(cmds , 0);
+                         emit StartSendCMD(cmdlist , 0);
                     }else{
                          qDebug() << "complie failed "  ;
                          ui->brower_status->setFixedSize(600, 500);
@@ -248,13 +241,23 @@ void MainWindow::DirDefault()
         mifile = fd.mid(index+1,fd.length());
         ui->listen_path->setText(fd.mid(0,index));
     }
-     if(temlist.length() >=2){
-         qDebug()<<"0=="+temlist[0];
-         qDebug()<<"1=="+temlist[1];
-         ui->cmd_input->setText(temlist.at(1).trimmed().simplified());
-     }
+}
 
-
+QStringList MainWindow::getCmdlist()
+{
+    QString path =  QCoreApplication::applicationDirPath()+"/cmdlist.txt";
+    QFile file(path);
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+      while (!file.atEnd())
+      {
+          QByteArray line = file.readLine();
+          QString str(line);
+          qDebug() << str.trimmed();
+          cmdlist << str.trimmed();
+      }
+      file.close();
+    }
 }
 
 void MainWindow::fileUpdated(const QString &path)
@@ -306,7 +309,7 @@ void MainWindow::on_listen_clicked()
 
     file->open(QIODevice ::ReadWrite|QFile::Truncate);
    // QStringList errorValue = ui->listen_path->text().trimmed().split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
-    QString writestring = ui->listen_path->text().trimmed()+"/"+mifile+"&&"+ui->cmd_input->text().trimmed();
+    QString writestring = ui->listen_path->text().trimmed()+"/"+mifile;
   //      QString writestring = errorValue[0].append("&&").append(ui->cmd_input->text().trimmed());
     qDebug()<<writestring;
      out<<writestring;

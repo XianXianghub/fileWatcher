@@ -2,6 +2,14 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>402</width>
+    <height>260</height>
+   </rect>
+  </property>
   <property name="minimumSize">
    <size>
     <width>402</width>
@@ -17,7 +25,7 @@
      <rect>
       <x>100</x>
       <y>110</y>
-      <width>171</width>
+      <width>271</width>
       <height>21</height>
      </rect>
     </property>
@@ -25,9 +33,9 @@
    <widget class="QLabel" name="label">
     <property name="geometry">
      <rect>
-      <x>40</x>
+      <x>30</x>
       <y>110</y>
-      <width>31</width>
+      <width>41</width>
       <height>21</height>
      </rect>
     </property>
@@ -38,8 +46,8 @@
    <widget class="QPushButton" name="chosedir">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>110</y>
+      <x>300</x>
+      <y>150</y>
       <width>75</width>
       <height>23</height>
      </rect>
@@ -51,37 +59,14 @@
    <widget class="QPushButton" name="listen">
     <property name="geometry">
      <rect>
-      <x>30</x>
+      <x>0</x>
       <y>20</y>
-      <width>61</width>
+      <width>91</width>
       <height>31</height>
      </rect>
     </property>
     <property name="text">
      <string>开始监听</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="label_2">
-    <property name="geometry">
-     <rect>
-      <x>40</x>
-      <y>150</y>
-      <width>31</width>
-      <height>21</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>CMD:</string>
-    </property>
-   </widget>
-   <widget class="QLineEdit" name="cmd_input">
-    <property name="geometry">
-     <rect>
-      <x>100</x>
-      <y>150</y>
-      <width>171</width>
-      <height>21</height>
-     </rect>
     </property>
    </widget>
    <widget class="QCheckBox" name="checkBox">
@@ -100,7 +85,7 @@
    <widget class="QPushButton" name="startmm">
     <property name="geometry">
      <rect>
-      <x>290</x>
+      <x>100</x>
       <y>150</y>
       <width>75</width>
       <height>23</height>
@@ -127,7 +112,7 @@
      <x>0</x>
      <y>0</y>
      <width>402</width>
-     <height>23</height>
+     <height>30</height>
     </rect>
    </property>
   </widget>

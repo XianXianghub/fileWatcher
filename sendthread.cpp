@@ -20,12 +20,12 @@ void sendthread::SendCmd(QStringList cmd, int flag)
 {
 
  //   qDebug()<<cmd+"  "+QString::number(flag,10);
-     qDebug()<<1111;
+
      for(int i=0;i<cmd.size();i++){
-            qDebug()<<"cmdddd=="+ cmd.at(i);
+            qDebug()<<"cmd=="+ cmd.at(i);
             QProcess adbProcess;
             QString strCmd =AppPath+cmd.at(i);
-
+            // qDebug()<<"path cmd="<<strCmd;
             adbProcess.start( strCmd);
 
             if(!adbProcess.waitForFinished(-1))
@@ -41,7 +41,7 @@ void sendthread::SendCmd(QStringList cmd, int flag)
                 else    //错误信息
                 {
                     ret =QString::fromLocal8Bit(adbProcess.readAllStandardError());
-                    qDebug()<<ret;
+                   // qDebug()<<ret;
 
                 }
 
