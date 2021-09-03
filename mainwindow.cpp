@@ -316,12 +316,16 @@ void MainWindow::on_listen_clicked()
     addWatchPath(listenPath);
     printLog("监听中...");
     ui->listen->setEnabled(false);
-
+    isListenning = true;
     setForceinit();
 }
 
 void MainWindow::on_startmm_clicked()
 {
+    if(!isListenning) {
+        QMessageBox::about(NULL, "error", "plz open listen");
+        return;
+    }
     listenPath  =  ui->listen_path->text();
     QString delfile= listenPath.trimmed()+"/btmp";
     QFileInfo file(delfile);
@@ -331,19 +335,17 @@ void MainWindow::on_startmm_clicked()
     if(file.exists()==false){
           qDebug()<<"文件不存在";
     }else{
-        QFile fileTemp(delfile);
-        fileTemp.remove();
-        fileTemp.close();
+       QFile fileTemp(delfile);
+       fileTemp.remove();
+       fileTemp.close();
 
        setWindowState(Qt::WindowActive);
        setGeometry(curGemRect);
        activateWindow();
        show();
        printLog("编译中...");
-       //判断定时器是否运行
-       if(timer->isActive())
-           timer->stop();   //停止定时器
-       timer->start(SHOWTIME);
+       setWindowState(Qt::WindowNoState);
+       hide();
     }
     ui->brower_status->setFixedSize(BrowerRect.width(),BrowerRect.height());
     this->setFixedSize(WindowRect.width(),WindowRect.height());
@@ -386,7 +388,7 @@ void MainWindow::printLog(QString str)
 
 void MainWindow::ReadLogShow()
 {
-    QString outpath = listenPath.trimmed()+"/out.log";
+    QString outpath = listenPath.trimmed()+"/out_last100.log";
     QFile file(outpath);
     QFileInfo finfo(outpath);
     qDebug()<<"forcefile=="+outpath;
@@ -402,12 +404,20 @@ void MainWindow::ReadLogShow()
         while (!txtInput.atEnd())
         {
             lineStr = txtInput.readLine();  //读取数据
-            if(lineStr.startsWith("location")>0)
-                ui->brower_status->append("<font color=\"#FF0000\">" + lineStr + "</font> ");//显示红色的字体。
-            else
+            if(lineStr.contains("Error",Qt::CaseInsensitive) ||
+                    lineStr.contains("failed",Qt::CaseInsensitive)){
+                if(lineStr.contains("Error",Qt::CaseInsensitive)){
+                    QRegExp valueRegExp(QString("(%1)").arg("Error"));
+                    valueRegExp.setCaseSensitivity(Qt::CaseInsensitive);
+                    lineStr = lineStr.replace(valueRegExp, "<font style='font-size:23px; background-color:white; color:red;'>\\1</font>");
+                }else if(lineStr.contains("failed",Qt::CaseInsensitive)){
+                    QRegExp valueRegExp(QString("(%1)").arg("failed"));
+                    valueRegExp.setCaseSensitivity(Qt::CaseInsensitive);
+                    lineStr = lineStr.replace(valueRegExp, "<font style='font-size:23px; background-color:white; color:red;'>\\1</font>");
+                }
+            }
                 ui->brower_status->append(lineStr);
         }
-
         file.close();
     }
 }

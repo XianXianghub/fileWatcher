@@ -64,14 +64,15 @@ private:
     QFileSystemWatcher *m_pSystemWatcher;
     QString listenPath;
     QString  mifile;
-     adb_find mfind;
-     QRect WindowRect;
-     QRect BrowerRect;
-     QTimer *timer;
-     int SHOWTIME = 500;
-     sendthread *mSendTread;
-      QThread *thread2;
-       QStringList cmdlist;
+    adb_find mfind;
+    QRect WindowRect;
+    QRect BrowerRect;
+    QTimer *timer;
+    int SHOWTIME = 3000;
+    sendthread *mSendTread;
+    QThread *thread2;
+    QStringList cmdlist;
+    boolean isListenning = false;
 };
 
 
