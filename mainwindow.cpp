@@ -20,7 +20,6 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->brower_status->setStyleSheet("font-size : 16px");
     m_pSystemWatcher = new QFileSystemWatcher();
     timer = new QTimer( this );
-
     thread2 = new QThread();
 
     mSendTread = new sendthread();       //发送命令线程，用于延时较大的命令
@@ -247,17 +246,20 @@ QStringList MainWindow::getCmdlist()
 {
     QString path =  QCoreApplication::applicationDirPath()+"/cmdlist.txt";
     QFile file(path);
+    cmdlist.clear();
     if (file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
       while (!file.atEnd())
       {
           QByteArray line = file.readLine();
           QString str(line);
-          qDebug() << str.trimmed();
+          if(str.trimmed().startsWith("#"))continue;
+          qDebug() <<"getCmdlist="<< str.trimmed();
           cmdlist << str.trimmed();
       }
-      file.close();
     }
+     file.close();
+     qDebug() <<"getCmdlist= end";
 }
 
 void MainWindow::fileUpdated(const QString &path)
@@ -328,24 +330,24 @@ void MainWindow::on_startmm_clicked()
     }
     listenPath  =  ui->listen_path->text();
     QString delfile= listenPath.trimmed()+"/btmp";
-    QFileInfo file(delfile);
-    qDebug()<<"delfile"+delfile;
-    qDebug()<<"window satte="+windowState();
+    QFileInfo file2(delfile);
+    qDebug()<<"delfile=="+delfile;
 
-    if(file.exists()==false){
-          qDebug()<<"文件不存在";
+    if(file2.exists()==false){
+          qDebug()<<delfile<<"文件不存在";
     }else{
        QFile fileTemp(delfile);
        fileTemp.remove();
        fileTemp.close();
-
        setWindowState(Qt::WindowActive);
        setGeometry(curGemRect);
        activateWindow();
        show();
        printLog("编译中...");
        setWindowState(Qt::WindowNoState);
-       hide();
+       if(timer->isActive())
+           timer->stop();   //停止定时器
+       timer->start(500);
     }
     ui->brower_status->setFixedSize(BrowerRect.width(),BrowerRect.height());
     this->setFixedSize(WindowRect.width(),WindowRect.height());
