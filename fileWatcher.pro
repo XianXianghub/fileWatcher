@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui network
+QT       += core gui network xml
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -16,11 +16,14 @@ SOURCES += main.cpp\
         mainwindow.cpp \
     smtp.cpp \
     adb_find.cpp \
-    sendthread.cpp
+    sendthread.cpp \
+    xmlutils.cpp
 
 HEADERS  += mainwindow.h \
     smtp.h \
     adb_find.h \
-    sendthread.h
+    sendthread.h \
+    xmlutils.h \
+    constlist.h
 
 FORMS    += mainwindow.ui

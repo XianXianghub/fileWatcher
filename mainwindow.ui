@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>402</width>
-    <height>260</height>
+    <width>404</width>
+    <height>321</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -40,20 +40,20 @@
      </rect>
     </property>
     <property name="text">
-     <string>路径:</string>
+     <string>path:</string>
     </property>
    </widget>
-   <widget class="QPushButton" name="chosedir">
+   <widget class="QPushButton" name="choseCmdfile">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>150</y>
+      <x>200</x>
+      <y>170</y>
       <width>75</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>选择文件</string>
+     <string>cmd</string>
     </property>
    </widget>
    <widget class="QPushButton" name="listen">
@@ -85,14 +85,14 @@
    <widget class="QPushButton" name="startmm">
     <property name="geometry">
      <rect>
-      <x>100</x>
-      <y>150</y>
+      <x>300</x>
+      <y>170</y>
       <width>75</width>
       <height>23</height>
      </rect>
     </property>
     <property name="text">
-     <string>开始编译</string>
+     <string>compile</string>
     </property>
    </widget>
    <widget class="QTextBrowser" name="brower_status">
@@ -105,13 +105,49 @@
      </rect>
     </property>
    </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>140</y>
+      <width>41</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>cmd:</string>
+    </property>
+   </widget>
+   <widget class="QLineEdit" name="listen_path_2">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>140</y>
+      <width>271</width>
+      <height>21</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="choselpath">
+    <property name="geometry">
+     <rect>
+      <x>100</x>
+      <y>170</y>
+      <width>75</width>
+      <height>23</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>lpath</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>402</width>
+     <width>404</width>
      <height>30</height>
     </rect>
    </property>

@@ -12,8 +12,9 @@
 #include "qxtglobalshortcut.h"
 #include "tipsdlg.h"
 #include "sendthread.h"
-
-
+#include "xmlutils.h"
+#include <QHash>
+#include "constlist.h"
 
 namespace Ui {
 class MainWindow;
@@ -33,6 +34,7 @@ public:
     void setForceinit();
     void printLog(QString str);
     void ReadLogShow();
+    void InitConfig();
     QRect curGemRect;
 public slots:
     void directoryUpdated(const QString &path); // 目录更新时调用，
@@ -43,13 +45,15 @@ public slots:
     void Timeout();
 
 private slots:
-    void on_chosedir_clicked();
-
     void on_listen_clicked();
 
     void on_startmm_clicked();
 
     void on_checkBox_clicked();
+
+    void on_choselpath_clicked();
+
+    void on_choseCmdfile_clicked();
 
 signals:
     void StartSendCMD(QStringList , int);
@@ -73,6 +77,8 @@ private:
     QThread *thread2;
     QStringList cmdlist;
     boolean isListenning = false;
+    XmlUtils *mXmlUtils;
+    QString cmdPath;
 };
 
 

@@ -27,6 +27,8 @@ MainWindow::MainWindow(QWidget *parent) :
     thread2->start();
     timer->setSingleShot(true);
     this->setWindowTitle("fileWatcher");
+    InitConfig();
+
     DirDefault();
     getCmdlist();
     connect(timer, SIGNAL(timeout()), this, SLOT(Timeout()) );
@@ -188,6 +190,8 @@ void MainWindow::directoryUpdated(const QString &path)
                          if(timer->isActive())
                              timer->stop();   //停止定时器
                          timer->start(SHOWTIME);
+                         if(cmdlist.isEmpty())
+                             QMessageBox::information(NULL, "Title", "先选择cmd file", QMessageBox::Yes, QMessageBox::Yes);
                          emit StartSendCMD(cmdlist , 0);
                     }else{
                          qDebug() << "complie failed "  ;
@@ -242,25 +246,7 @@ void MainWindow::DirDefault()
     }
 }
 
-QStringList MainWindow::getCmdlist()
-{
-    QString path =  QCoreApplication::applicationDirPath()+"/cmdlist.txt";
-    QFile file(path);
-    cmdlist.clear();
-    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
-    {
-      while (!file.atEnd())
-      {
-          QByteArray line = file.readLine();
-          QString str(line);
-          if(str.trimmed().startsWith("#"))continue;
-          qDebug() <<"getCmdlist="<< str.trimmed();
-          cmdlist << str.trimmed();
-      }
-    }
-     file.close();
-     qDebug() <<"getCmdlist= end";
-}
+
 
 void MainWindow::fileUpdated(const QString &path)
 {
@@ -271,24 +257,6 @@ void MainWindow::fileUpdated(const QString &path)
     qDebug() << QString("The file %1 at path %2 is updated").arg(strName).arg(strPath);
 }
 
-void MainWindow::on_chosedir_clicked()
-{
-     QString filename = QFileDialog::getOpenFileName(
-                   this, "选择文件",
-                   ui->listen_path->text(),
-                   "所有文件 (*.*);; ");
-       qDebug() << "path=" << filename;
-       if (!filename.isEmpty())
-       {
-            int index = filename.lastIndexOf("/");
-            qDebug()<<filename.mid(0,index);
-            qDebug()<<filename.mid(index+1,filename.length());
-            mifile = filename.mid(index+1,filename.length());
-            ui->listen_path->setText(filename.mid(0,index));
-       }
-
-
-}
 
 void MainWindow::on_listen_clicked()
 {
@@ -324,6 +292,10 @@ void MainWindow::on_listen_clicked()
 
 void MainWindow::on_startmm_clicked()
 {
+    if(cmdlist.isEmpty()){
+         QMessageBox::about(NULL, "error", "先选择cmd file");
+         return;
+    }
     if(!isListenning) {
         QMessageBox::about(NULL, "error", "plz open listen");
         return;
@@ -424,6 +396,23 @@ void MainWindow::ReadLogShow()
     }
 }
 
+void MainWindow::InitConfig()
+{
+
+    QString dir =  QCoreApplication::applicationDirPath()+"/config.xml";
+    mXmlUtils = new XmlUtils(dir);
+    //打开或创建文件
+    QFileInfo file(dir); //相对路径、绝对路径、资源路径都可以
+    if(!file.exists()){
+       qDebug()<<"write xml to file...";
+       mXmlUtils->WriteXml();
+    }
+
+    qDebug()<< mXmlUtils->ReadXml(LISTENPATH);
+    mXmlUtils->UpdateXml(LISTENPATH,"111111111");
+
+}
+
 void MainWindow::on_checkBox_clicked()
 {
     listenPath  =  ui->listen_path->text();
@@ -451,4 +440,55 @@ void MainWindow::on_checkBox_clicked()
         }
     }
 
+}
+
+void MainWindow::on_choselpath_clicked()
+{
+      QString filename = QFileDialog::getOpenFileName(
+                  this, "选择文件",
+                  ui->listen_path->text(),
+                  "所有文件 (*.*);; ");
+      qDebug() << "path=" << filename;
+      if (!filename.isEmpty())
+      {
+           int index = filename.lastIndexOf("/");
+           qDebug()<<filename.mid(0,index);
+           qDebug()<<filename.mid(index+1,filename.length());
+           mifile = filename.mid(index+1,filename.length());
+           ui->listen_path->setText(filename.mid(0,index));
+      }
+}
+
+void MainWindow::on_choseCmdfile_clicked()
+{
+    QString filename = QFileDialog::getOpenFileName(
+                this, "选择文件",
+                ui->listen_path->text(),
+                "所有文件 (*.*);; ");
+    cmdPath = filename;
+    qDebug() << "path=" << filename;
+    getCmdlist();
+}
+
+QStringList MainWindow::getCmdlist()
+{
+    QFileInfo info(cmdPath);
+    if(!info.exists()){
+        return cmdlist;
+    }
+    QFile file(cmdPath);
+    cmdlist.clear();
+    if (file.open(QIODevice::ReadOnly | QIODevice::Text))
+    {
+      while (!file.atEnd())
+      {
+          QByteArray line = file.readLine();
+          QString str(line);
+          if(str.trimmed().startsWith("#"))continue;
+          qDebug() <<"getCmdlist="<< str.trimmed();
+          cmdlist << str.trimmed();
+      }
+    }
+     file.close();
+     qDebug() <<"getCmdlist= end";
 }
