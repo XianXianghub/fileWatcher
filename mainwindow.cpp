@@ -29,7 +29,6 @@ MainWindow::MainWindow(QWidget *parent) :
     this->setWindowTitle("fileWatcher");
     InitConfig();
     cmdlist = new QStringList();
-    DirDefault();
     getCmdlist();
     connect(timer, SIGNAL(timeout()), this, SLOT(Timeout()) );
     connect(m_pSystemWatcher, SIGNAL(directoryChanged(QString)), this, SLOT(directoryUpdated(QString)));
@@ -79,7 +78,6 @@ void MainWindow::moveEvent(QMoveEvent *event)
 
 void MainWindow::on_pushButton_clicked()
 {
-  qDebug()<<"yyy";
   on_startmm_clicked();
 }
 
@@ -214,33 +212,6 @@ void MainWindow::directoryUpdated(const QString &path)
         }
     }
 }
-void MainWindow::DirDefault()
-{
-
-    QStringList temlist;
-    QString dir =  QCoreApplication::applicationDirPath()+"/defaut.txt";
-    defautarg = new QFile(dir);
-    if (defautarg->open(QIODevice ::ReadWrite))
-    {
-        QByteArray line = defautarg->readLine();
-        QString str(line);
-        qDebug()<< str;
-        temlist = str.split("&&");
-    }
-
-    if(temlist.length() >=1){
-
-        QString fd = temlist.at(0).trimmed().simplified();
-        int index = fd.lastIndexOf("/");
-        qDebug()<<fd.mid(0,index);
-        qDebug()<<fd.mid(index+1,fd.length());
-        mifile = fd.mid(index+1,fd.length());
-        ui->listen_path->setText(fd.mid(0,index));
-    }
-}
-
-
-
 void MainWindow::fileUpdated(const QString &path)
 {
     QFileInfo file(path);

@@ -25,7 +25,6 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 public:
     void addWatchPath(QString path);
-    void DirDefault();
     QStringList *getCmdlist();
     explicit MainWindow(QWidget *parent = 0);
          ~MainWindow();

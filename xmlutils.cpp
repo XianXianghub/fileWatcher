@@ -92,7 +92,6 @@ QString XmlUtils::ReadXml(QString key)
 
 void XmlUtils::UpdateXml(QString key, QString val)
 {
-     qDebug()<<path;
       QFile file(path);
       if(!file.open(QFile::ReadOnly))
           return;
@@ -112,11 +111,22 @@ void XmlUtils::UpdateXml(QString key, QString val)
           QString tagName = node.toElement().tagName();  //节点元素名称
           if (tagName.compare(key) == 0) //节点标记查找
           {
-               qDebug()<<"key="<<tagName;
-              QDomNode oldnode = node.firstChild();     //标签之间的内容作为节点的子节点出现，得到原来的子节点
-              node.firstChild().setNodeValue(val);   //用提供的value值来设置子节点的内容
-              QDomNode newnode = node.firstChild();     //值修改过后
-              node.replaceChild(newnode,oldnode);      //调用节点的replaceChild方法实现修改功能
+
+
+              if(node.hasChildNodes())
+              {
+                  QDomNode oldnode = node.firstChild();
+                  node.firstChild().setNodeValue(val);
+                  QDomNode newnode = node.firstChild();
+                  node.replaceChild(newnode,oldnode);
+              }
+              else
+              {
+                  QDomText text;
+                  text = doc.createTextNode(val);
+                  node.appendChild(text);
+                  text.clear();
+              }
               map.insert((key),val);
               break;
           }
