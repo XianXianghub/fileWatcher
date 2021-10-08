@@ -26,7 +26,7 @@ class MainWindow : public QMainWindow
 public:
     void addWatchPath(QString path);
     void DirDefault();
-    QStringList getCmdlist();
+    QStringList *getCmdlist();
     explicit MainWindow(QWidget *parent = 0);
          ~MainWindow();
     void resizeEvent(QResizeEvent*event);
@@ -75,7 +75,7 @@ private:
     int SHOWTIME = 3000;
     sendthread *mSendTread;
     QThread *thread2;
-    QStringList cmdlist;
+    QStringList *cmdlist;
     boolean isListenning = false;
     XmlUtils *mXmlUtils;
     QString cmdPath;

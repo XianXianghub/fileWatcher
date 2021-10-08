@@ -118,7 +118,7 @@
      <string>cmd:</string>
     </property>
    </widget>
-   <widget class="QLineEdit" name="listen_path_2">
+   <widget class="QLineEdit" name="cmd_path">
     <property name="geometry">
      <rect>
       <x>100</x>

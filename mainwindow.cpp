@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent) :
     timer->setSingleShot(true);
     this->setWindowTitle("fileWatcher");
     InitConfig();
-
+    cmdlist = new QStringList();
     DirDefault();
     getCmdlist();
     connect(timer, SIGNAL(timeout()), this, SLOT(Timeout()) );
@@ -190,9 +190,9 @@ void MainWindow::directoryUpdated(const QString &path)
                          if(timer->isActive())
                              timer->stop();   //停止定时器
                          timer->start(SHOWTIME);
-                         if(cmdlist.isEmpty())
+                         if(cmdlist->isEmpty())
                              QMessageBox::information(NULL, "Title", "先选择cmd file", QMessageBox::Yes, QMessageBox::Yes);
-                         emit StartSendCMD(cmdlist , 0);
+                         emit StartSendCMD(*cmdlist , 0);
                     }else{
                          qDebug() << "complie failed "  ;
                          ui->brower_status->setFixedSize(600, 500);
@@ -203,20 +203,13 @@ void MainWindow::directoryUpdated(const QString &path)
                          setGeometry(curGemRect);
                          activateWindow();
                          show();
+                         ui->listen_path->setVisible(false);
+                         ui->listen->setVisible(false);
+                         ui->cmd_path->setVisible(false);
+                         ui->choselpath->setVisible(false);
                          ReadLogShow();
                     }
                 }
-            }
-        }
-
-        // 从Dir中删除文件/目录
-        if (!deleteFile.isEmpty())
-        {
-            qDebug() << "Files/Dirs deleted: " << deleteFile;
-
-            foreach(QString file, deleteFile)
-            {
-                // 处理操作每个被删除的文件....
             }
         }
     }
@@ -292,7 +285,7 @@ void MainWindow::on_listen_clicked()
 
 void MainWindow::on_startmm_clicked()
 {
-    if(cmdlist.isEmpty()){
+    if(cmdlist->isEmpty()){
          QMessageBox::about(NULL, "error", "先选择cmd file");
          return;
     }
@@ -300,6 +293,10 @@ void MainWindow::on_startmm_clicked()
         QMessageBox::about(NULL, "error", "plz open listen");
         return;
     }
+    ui->listen_path->setVisible(true);
+    ui->listen->setVisible(true);
+    ui->cmd_path->setVisible(true);
+    ui->choselpath->setVisible(true);
     listenPath  =  ui->listen_path->text();
     QString delfile= listenPath.trimmed()+"/btmp";
     QFileInfo file2(delfile);
@@ -407,10 +404,8 @@ void MainWindow::InitConfig()
        qDebug()<<"write xml to file...";
        mXmlUtils->WriteXml();
     }
-
-    qDebug()<< mXmlUtils->ReadXml(LISTENPATH);
-    mXmlUtils->UpdateXml(LISTENPATH,"111111111");
-
+    ui->cmd_path->setText(mXmlUtils->ReadXml(CMDPATH));
+    ui->listen_path->setText(mXmlUtils->ReadXml(LISTENPATH));
 }
 
 void MainWindow::on_checkBox_clicked()
@@ -456,6 +451,7 @@ void MainWindow::on_choselpath_clicked()
            qDebug()<<filename.mid(index+1,filename.length());
            mifile = filename.mid(index+1,filename.length());
            ui->listen_path->setText(filename.mid(0,index));
+           mXmlUtils->UpdateXml(LISTENPATH,filename.mid(0,index));
       }
 }
 
@@ -463,21 +459,28 @@ void MainWindow::on_choseCmdfile_clicked()
 {
     QString filename = QFileDialog::getOpenFileName(
                 this, "选择文件",
-                ui->listen_path->text(),
+                ui->cmd_path->text(),
                 "所有文件 (*.*);; ");
     cmdPath = filename;
     qDebug() << "path=" << filename;
+    ui->cmd_path->setText(filename);
+    mXmlUtils->UpdateXml(CMDPATH,filename);
     getCmdlist();
 }
 
-QStringList MainWindow::getCmdlist()
+QStringList* MainWindow::getCmdlist()
 {
+
     QFileInfo info(cmdPath);
     if(!info.exists()){
-        return cmdlist;
+          cmdPath = ui->cmd_path->text().trimmed();
+          QFileInfo info1(cmdPath);
+           if(!info1.exists()){
+               return cmdlist;
+           }
     }
     QFile file(cmdPath);
-    cmdlist.clear();
+    cmdlist->clear();
     if (file.open(QIODevice::ReadOnly | QIODevice::Text))
     {
       while (!file.atEnd())
@@ -486,9 +489,8 @@ QStringList MainWindow::getCmdlist()
           QString str(line);
           if(str.trimmed().startsWith("#"))continue;
           qDebug() <<"getCmdlist="<< str.trimmed();
-          cmdlist << str.trimmed();
+          *cmdlist << str.trimmed();
       }
     }
      file.close();
-     qDebug() <<"getCmdlist= end";
 }
