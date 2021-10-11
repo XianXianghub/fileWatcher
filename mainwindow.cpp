@@ -119,15 +119,6 @@ void MainWindow::addWatchPath(QString path)
         const QDir dirw(path);
         m_currentContentsMap[path] = dirw.entryList(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files, QDir::DirsFirst);
     }
-    QTextStream txtOutput(defautarg);
-
-    defautarg->close();
-    defautarg->open(QIODevice::Truncate);
-    defautarg->close();
-
-    defautarg->open(QIODevice ::ReadWrite);
-
-    txtOutput<<path<<endl;
 }
 
 void MainWindow::directoryUpdated(const QString &path)
@@ -225,28 +216,10 @@ void MainWindow::fileUpdated(const QString &path)
 void MainWindow::on_listen_clicked()
 {
     listenPath  =  ui->listen_path->text();
-    qDebug()<<"listenPath"+listenPath;
     if(listenPath.isEmpty())   {
         QMessageBox::information(this,"warning", "请选择目录");
         return;
     }
-
-    QString dir =  QCoreApplication::applicationDirPath()+"/defaut.txt";
-    qDebug()<<dir;
-    QFile *file = new QFile(dir);
-
-    QTextStream out(file);
-
-    file->close();
-    file->open(QIODevice::Truncate);
-    file->close();
-
-    file->open(QIODevice ::ReadWrite|QFile::Truncate);
-   // QStringList errorValue = ui->listen_path->text().trimmed().split(QRegExp("[\r\n]"),QString::SkipEmptyParts);
-    QString writestring = ui->listen_path->text().trimmed()+"/"+mifile;
-  //      QString writestring = errorValue[0].append("&&").append(ui->cmd_input->text().trimmed());
-    qDebug()<<writestring;
-     out<<writestring;
     addWatchPath(listenPath);
     printLog("监听中...");
     ui->listen->setEnabled(false);
@@ -432,11 +405,14 @@ void MainWindow::on_choseCmdfile_clicked()
                 this, "选择文件",
                 ui->cmd_path->text(),
                 "所有文件 (*.*);; ");
-    cmdPath = filename;
-    qDebug() << "path=" << filename;
-    ui->cmd_path->setText(filename);
-    mXmlUtils->UpdateXml(CMDPATH,filename);
-    getCmdlist();
+    if (!filename.isEmpty())
+    {
+        cmdPath = filename;
+        qDebug() << "path=" << filename;
+        ui->cmd_path->setText(filename);
+        mXmlUtils->UpdateXml(CMDPATH,filename);
+        getCmdlist();
+    }
 }
 
 QStringList* MainWindow::getCmdlist()

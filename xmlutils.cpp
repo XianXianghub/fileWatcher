@@ -111,8 +111,6 @@ void XmlUtils::UpdateXml(QString key, QString val)
           QString tagName = node.toElement().tagName();  //节点元素名称
           if (tagName.compare(key) == 0) //节点标记查找
           {
-
-
               if(node.hasChildNodes())
               {
                   QDomNode oldnode = node.firstChild();
