@@ -51,9 +51,9 @@ void XmlUtils::WriteXml()
 
 QString XmlUtils::ReadXml(QString key)
 {
-       if(!map.isEmpty()){
-           return map.find(key).value();
-       }
+//       if(!map.isEmpty()){
+//           return map.find(key).value();
+//       }
       //  qDebug()<< "sss"<< map.find(key).value();
     //打开或创建文件
        QFile file(path); //相对路径、绝对路径、资源路径都行

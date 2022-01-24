@@ -24,10 +24,10 @@ public:
     QString ret;
     SendApp(QString ip, QString info);
     adb_find mfind;
-
+    bool SendCmdSingle(QString cmd,int flag);
     QString AppPath;
 signals:
-
+    sigSendStatus(QString msg);
 public slots:
     void SendCmd(QStringList,int);
 

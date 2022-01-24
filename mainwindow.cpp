@@ -35,6 +35,7 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_pSystemWatcher, SIGNAL(fileChanged(QString)), this, SLOT(fileUpdated(QString)));
     connect(ui->brower_status, SIGNAL(textChanged()), this, SLOT(autoScroll()));
     connect(this,SIGNAL(StartSendCMD(QStringList , int)),mSendTread,SLOT(SendCmd(QStringList,int)));  //发送耗时命令到线程执行
+    connect(mSendTread,SIGNAL(sigSendStatus(QString)),this,SLOT(slotAdbSendstatus(QString)));  //发送耗时命令到线程执行
 
     QxtGlobalShortcut *shortcut = new QxtGlobalShortcut(this);
     QxtGlobalShortcut *shortcutClose = new QxtGlobalShortcut(this);
@@ -83,10 +84,10 @@ void MainWindow::on_pushButton_clicked()
 
 void MainWindow::on_close_slot()
 {
-    setWindowState(Qt::WindowActive);
-    setGeometry(curGemRect);
-    activateWindow();
-    show();
+  setWindowState(Qt::WindowActive);
+  setGeometry(curGemRect);
+  activateWindow();
+  show();
 }
 
 void MainWindow::autoScroll()
@@ -102,6 +103,38 @@ void MainWindow::Timeout()
       setWindowState(Qt::WindowNoState);
       hide();
 
+}
+
+void MainWindow::slotAdbSendstatus(QString msg)
+{
+    if(msg.compare("success") == 0){
+
+         qDebug() << "slotAdbSendstatus  sucess "  ;
+
+         printLog("编译成功");
+         setWindowState(Qt::WindowActive);
+         setGeometry(curGemRect);
+         activateWindow();
+         show();
+         if(timer->isActive())
+             timer->stop();   //停止定时器
+         timer->start(SHOWTIME);
+    }else{
+        qDebug() << "run cmd failed "  ;
+        ui->brower_status->setFixedSize(BrowerRect.width(),BrowerRect.height());
+        this->setFixedSize(WindowRect.width(),WindowRect.height());
+
+        ui->brower_status->clear();
+        printLog("adb cmd excute failed");
+        setWindowState(Qt::WindowActive);
+        setGeometry(curGemRect);
+        activateWindow();
+        show();
+        ui->listen_path->setVisible(false);
+        ui->listen->setVisible(false);
+        ui->cmd_path->setVisible(false);
+        ui->choselpath->setVisible(false);
+    }
 }
 
 MainWindow::~MainWindow()
@@ -169,19 +202,11 @@ void MainWindow::directoryUpdated(const QString &path)
                     file.close();
                     qDebug() << "mifile ret=" << ret<<"===";
                     if(ret.compare("1")==0){
-                         qDebug() << "complie sucess "  ;
-                         printLog("编译成功");
-                         setWindowState(Qt::WindowActive);
-                         setGeometry(curGemRect);
-                         activateWindow();
-                         show();
+                        qDebug() << "complie sucess ,statt run cmd "  ;
+                        if(cmdlist->isEmpty())
+                            QMessageBox::information(NULL, "Title", "先选择cmd file", QMessageBox::Yes, QMessageBox::Yes);
 
-                         if(timer->isActive())
-                             timer->stop();   //停止定时器
-                         timer->start(SHOWTIME);
-                         if(cmdlist->isEmpty())
-                             QMessageBox::information(NULL, "Title", "先选择cmd file", QMessageBox::Yes, QMessageBox::Yes);
-                         emit StartSendCMD(*cmdlist , 0);
+                         emit StartSendCMD(*cmdlist , 1);
                     }else{
                          qDebug() << "complie failed "  ;
                          ui->brower_status->setFixedSize(600, 500);
@@ -342,6 +367,7 @@ void MainWindow::InitConfig()
 
     QString dir =  QCoreApplication::applicationDirPath()+"/config.xml";
     mXmlUtils = new XmlUtils(dir);
+      qDebug()<<"dir="<<dir;
     //打开或创建文件
     QFileInfo file(dir); //相对路径、绝对路径、资源路径都可以
     if(!file.exists()){

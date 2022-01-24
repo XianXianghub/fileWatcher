@@ -42,6 +42,7 @@ public slots:
     void on_close_slot();
     void autoScroll();
     void Timeout();
+    void slotAdbSendstatus(QString msg);
 
 private slots:
     void on_listen_clicked();
